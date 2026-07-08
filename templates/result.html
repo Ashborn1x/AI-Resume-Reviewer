@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Result | AI Resume Analyzer{% endblock %}
+
+{% block content %}
+<section class="space-y-8">
+  <div class="flex flex-col gap-4 border-b border-zinc-200 pb-6 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="text-sm text-zinc-500">{{ record.original_filename }} analyzed with {{ record.provider }} / {{ record.model_name }}</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight">Resume Analysis</h1>
+      <p class="mt-2 text-zinc-600">{{ analysis.profession }}</p>
+    </div>
+    <a href="/" class="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-100">Analyze another</a>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-lg border border-zinc-200 bg-white p-5">
+      <p class="text-sm text-zinc-500">Overall Score</p>
+      <p class="mt-2 text-4xl font-semibold">{{ analysis.overall_score }}</p>
+    </div>
+    <div class="rounded-lg border border-zinc-200 bg-white p-5">
+      <p class="text-sm text-zinc-500">ATS Score</p>
+      <p class="mt-2 text-4xl font-semibold">{{ analysis.ats_score }}</p>
+    </div>
+    <div class="rounded-lg border border-zinc-200 bg-white p-5">
+      <p class="text-sm text-zinc-500">Interview Probability</p>
+      <p class="mt-2 text-4xl font-semibold">{{ analysis.interview_probability }}%</p>
+    </div>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    {% for title, value in feedback_sections %}
+    <article class="rounded-lg border border-zinc-200 bg-white p-5">
+      <h2 class="text-lg font-semibold">{{ title }}</h2>
+      <p class="mt-3 leading-7 text-zinc-700">{{ value }}</p>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-3">
+    {% for title, items in item_groups %}
+    <article class="rounded-lg border border-zinc-200 bg-white p-5">
+      <h2 class="text-lg font-semibold">{{ title }}</h2>
+      <ul class="mt-3 space-y-2 text-sm leading-6 text-zinc-700">
+        {% for item in items %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+
+  <article class="rounded-lg border border-zinc-200 bg-white p-5">
+    <h2 class="text-lg font-semibold">Recommendations</h2>
+    <ul class="mt-3 grid gap-2 text-sm leading-6 text-zinc-700 md:grid-cols-2">
+      {% for item in analysis.recommendations %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </article>
+</section>
+{% endblock %}
