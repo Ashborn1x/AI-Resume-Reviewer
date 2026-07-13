@@ -3,45 +3,51 @@
 {% block title %}Analysis Result | AI Resume Analyzer{% endblock %}
 
 {% block content %}
-<section class="space-y-8">
-  <div class="flex flex-col gap-4 border-b border-zinc-200 pb-6 md:flex-row md:items-end md:justify-between">
+<section>
+  <div class="results-header">
     <div>
-      <p class="text-sm text-zinc-500">{{ record.original_filename }} analyzed with {{ record.provider }} / {{ record.model_name }}</p>
-      <h1 class="mt-2 text-3xl font-semibold tracking-tight">Resume Analysis</h1>
-      <p class="mt-2 text-zinc-600">{{ analysis.profession }}</p>
+      <p class="results-meta">{{ record.original_filename }} analyzed with {{ record.provider }} / {{ record.model_name }}</p>
+      <h1 class="results-title">Resume <span class="text-gradient">Analysis</span></h1>
+      <p class="results-profession">{{ analysis.profession }}</p>
     </div>
-    <a href="/" class="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-100">Analyze another</a>
+    <a href="/" class="btn-secondary">Analyze another</a>
   </div>
 
-  <div class="grid gap-4 md:grid-cols-3">
-    <div class="rounded-lg border border-zinc-200 bg-white p-5">
-      <p class="text-sm text-zinc-500">Overall Score</p>
-      <p class="mt-2 text-4xl font-semibold">{{ analysis.overall_score }}</p>
+  <div class="score-grid">
+    <div class="glass-card score-card">
+      <p class="score-label">Overall Score</p>
+      <p class="score-value {% if analysis.overall_score >= 80 %}high{% elif analysis.overall_score >= 60 %}medium{% else %}low{% endif %}">
+        {{ analysis.overall_score }}
+      </p>
     </div>
-    <div class="rounded-lg border border-zinc-200 bg-white p-5">
-      <p class="text-sm text-zinc-500">ATS Score</p>
-      <p class="mt-2 text-4xl font-semibold">{{ analysis.ats_score }}</p>
+    <div class="glass-card score-card">
+      <p class="score-label">ATS Score</p>
+      <p class="score-value {% if analysis.ats_score >= 80 %}high{% elif analysis.ats_score >= 60 %}medium{% else %}low{% endif %}">
+        {{ analysis.ats_score }}
+      </p>
     </div>
-    <div class="rounded-lg border border-zinc-200 bg-white p-5">
-      <p class="text-sm text-zinc-500">Interview Probability</p>
-      <p class="mt-2 text-4xl font-semibold">{{ analysis.interview_probability }}%</p>
+    <div class="glass-card score-card">
+      <p class="score-label">Interview Probability</p>
+      <p class="score-value {% if analysis.interview_probability >= 80 %}high{% elif analysis.interview_probability >= 60 %}medium{% else %}low{% endif %}">
+        {{ analysis.interview_probability }}<span style="font-size: 0.5em">%</span>
+      </p>
     </div>
   </div>
 
-  <div class="grid gap-6 md:grid-cols-2">
+  <div class="feedback-grid">
     {% for title, value in feedback_sections %}
-    <article class="rounded-lg border border-zinc-200 bg-white p-5">
-      <h2 class="text-lg font-semibold">{{ title }}</h2>
-      <p class="mt-3 leading-7 text-zinc-700">{{ value }}</p>
+    <article class="glass-card">
+      <h2 class="card-title">{{ title }}</h2>
+      <p class="card-text">{{ value }}</p>
     </article>
     {% endfor %}
   </div>
 
-  <div class="grid gap-6 md:grid-cols-3">
+  <div class="items-grid">
     {% for title, items in item_groups %}
-    <article class="rounded-lg border border-zinc-200 bg-white p-5">
-      <h2 class="text-lg font-semibold">{{ title }}</h2>
-      <ul class="mt-3 space-y-2 text-sm leading-6 text-zinc-700">
+    <article class="glass-card">
+      <h2 class="card-title">{{ title }}</h2>
+      <ul class="card-list">
         {% for item in items %}
         <li>{{ item }}</li>
         {% endfor %}
@@ -50,13 +56,15 @@
     {% endfor %}
   </div>
 
-  <article class="rounded-lg border border-zinc-200 bg-white p-5">
-    <h2 class="text-lg font-semibold">Recommendations</h2>
-    <ul class="mt-3 grid gap-2 text-sm leading-6 text-zinc-700 md:grid-cols-2">
+  <article class="glass-card">
+    <h2 class="card-title">Recommendations</h2>
+    <div class="recommendations-grid">
       {% for item in analysis.recommendations %}
-      <li>{{ item }}</li>
+      <div class="card-list">
+        <li>{{ item }}</li>
+      </div>
       {% endfor %}
-    </ul>
+    </div>
   </article>
 </section>
 {% endblock %}
