@@ -1,6 +1,6 @@
 # AI Resume Analyzer
 
-Backend-first FastAPI MVP for uploading resumes, extracting text, analyzing them with a local Ollama LLM, validating structured JSON, and rendering server-side HTML reports.
+Backend-first FastAPI MVP for uploading resumes, extracting text, analyzing them with AWS Bedrock, validating structured JSON, and rendering server-side HTML reports.
 
 ## Stack
 
@@ -11,7 +11,7 @@ Backend-first FastAPI MVP for uploading resumes, extracting text, analyzing them
 - SQLAlchemy 2.0
 - Alembic
 - SQLite by default, PostgreSQL-ready through `DATABASE_URL`
-- Ollama for local development
+- AWS Bedrock for AI inference
 
 ## Local Setup
 
@@ -42,36 +42,22 @@ Or, on Windows with the local virtual environment:
 
 Open `http://127.0.0.1:8000`.
 
-## Configure Ollama
+## Configure AWS Bedrock
 
-Install and start Ollama, then pull any supported model:
+Enable access to your selected Bedrock model in the AWS console, then configure local AWS credentials. For development, the AWS CLI is the simplest option:
 
 ```bash
-ollama pull llama3.1
-ollama serve
+aws configure
 ```
 
-Set the model in `.env`:
+Set an AWS region and a Bedrock model ID in `.env`:
 
 ```env
-AI_PROVIDER=ollama
-AI_MODEL=llama3.1
-OLLAMA_BASE_URL=http://localhost:11434
+AWS_REGION=us-east-1
+AI_MODEL=anthropic.claude-3-5-haiku-20241022-v1:0
 ```
 
-Model names are never hardcoded in the application. Change `AI_MODEL` to use Llama, Qwen, Mistral, Gemma, or another local model available in Ollama.
-
-## Changing AI Providers
-
-AI access is isolated under `app/ai`. The application calls `AIService`, which delegates to a provider created by `create_ai_provider`.
-
-To add Bedrock, OpenAI, or Anthropic later:
-
-1. Implement `AIProvider` in `app/ai/providers/`.
-2. Register the provider in `app/ai/provider_factory.py`.
-3. Set `AI_PROVIDER` in `.env`.
-
-No route, parser, prompt, or template code should need to change.
+The application uses the standard AWS credential provider chain: AWS CLI credentials, environment variables, or an IAM role in AWS. Never add access keys to `.env` or commit them. Change `AI_MODEL` to any model enabled for your account and region that supports the Bedrock Converse API.
 
 ## Prompt Management
 
@@ -135,4 +121,4 @@ For a later App Runner deployment:
 - Store secrets in AWS Secrets Manager or App Runner secrets.
 - Use S3 instead of local `uploads` for durable file storage.
 - Use PostgreSQL through RDS or Aurora.
-- Add a production AI provider such as Bedrock behind the existing provider interface.
+- Grant the App Runner instance role permission to invoke the configured Bedrock model.
