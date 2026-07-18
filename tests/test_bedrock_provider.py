@@ -29,6 +29,13 @@ def test_extract_text_rejects_empty_bedrock_output() -> None:
     assert BedrockProvider._extract_text({"output": {"message": {"content": []}}}) == ""
 
 
+def test_extract_error_details_reads_bedrock_client_error() -> None:
+    exc = Mock()
+    exc.response = {"Error": {"Code": "ValidationException", "Message": "Operation not allowed"}}
+
+    assert BedrockProvider._extract_error_details(exc) == ("ValidationException", "Operation not allowed")
+
+
 @pytest.mark.asyncio
 async def test_generate_json_rejects_empty_bedrock_output(mocker: Mock) -> None:
     client = Mock()

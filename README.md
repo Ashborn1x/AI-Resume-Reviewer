@@ -115,10 +115,31 @@ The app is structured for dependency injection so services, parsers, repositorie
 
 ## AWS App Runner Notes
 
-For a later App Runner deployment:
+For AWS App Runner deployment:
+
+You have two options:
+
+1. Source code deploy using `apprunner.yaml`.
+2. Container deploy using the included `Dockerfile`.
+
+For the source code path, App Runner can build directly from the repo with the included `apprunner.yaml`.
+
+Set these runtime environment variables:
+
+```env
+AWS_REGION=ap-southeast-1
+AI_MODEL=apac.amazon.nova-lite-v1:0
+APP_ENV=production
+APP_DEBUG=false
+LOG_LEVEL=INFO
+```
+
+Notes:
 
 - Use environment variables for all configuration.
-- Store secrets in AWS Secrets Manager or App Runner secrets.
+- Store secrets in App Runner secrets or AWS Secrets Manager.
 - Use S3 instead of local `uploads` for durable file storage.
-- Use PostgreSQL through RDS or Aurora.
+- Use PostgreSQL through RDS or Aurora if you want persistence.
 - Grant the App Runner instance role permission to invoke the configured Bedrock model.
+- If you only want a demo host right now, local SQLite and local uploads are enough for a first deployment.
+- App Runner passes `PORT` automatically, so the app must listen on `0.0.0.0:8080`, which is what the config file uses.

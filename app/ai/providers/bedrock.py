@@ -42,9 +42,18 @@ class BedrockProvider(AIProvider):
                 inferenceConfig={"temperature": 0.1},
             )
         except (BotoCoreError, ClientError) as exc:
-            logger.warning("bedrock_request_failed", extra={"model": self._model_name})
+            error_code, error_message = self._extract_error_details(exc)
+            logger.warning(
+                "bedrock_request_failed",
+                extra={
+                    "model": self._model_name,
+                    "aws_error_code": error_code,
+                    "aws_error_message": error_message,
+                },
+            )
+            details = f"{error_code}: {error_message}" if error_code or error_message else "unknown AWS error"
             raise AIProviderError(
-                "The AWS Bedrock request failed. Verify AWS credentials, region, model access, and network connectivity."
+                f"The AWS Bedrock request failed ({details}). Verify AWS credentials, region, model access, and network connectivity."
             ) from exc
 
         generated = self._extract_text(response)
@@ -58,3 +67,17 @@ class BedrockProvider(AIProvider):
         return "".join(
             block["text"] for block in content if isinstance(block, dict) and isinstance(block.get("text"), str)
         ).strip()
+
+    @staticmethod
+    def _extract_error_details(exc: Exception) -> tuple[str | None, str | None]:
+        response = getattr(exc, "response", None)
+        if not isinstance(response, dict):
+            return None, None
+
+        error = response.get("Error")
+        if not isinstance(error, dict):
+            return None, None
+
+        code = error.get("Code")
+        message = error.get("Message")
+        return (code if isinstance(code, str) else None, message if isinstance(message, str) else None)
