@@ -54,7 +54,7 @@ Set an AWS region and a Bedrock model ID in `.env`:
 
 ```env
 AWS_REGION=us-east-1
-AI_MODEL=anthropic.claude-3-5-haiku-20241022-v1:0
+AI_MODEL=global.amazon.nova-2-lite-v1:0
 ```
 
 The application uses the standard AWS credential provider chain: AWS CLI credentials, environment variables, or an IAM role in AWS. Never add access keys to `.env` or commit them. Change `AI_MODEL` to any model enabled for your account and region that supports the Bedrock Converse API.
@@ -113,22 +113,15 @@ pytest
 
 The app is structured for dependency injection so services, parsers, repositories, and AI providers can be tested independently.
 
-## AWS App Runner Notes
+## Deployment Notes
 
-For AWS App Runner deployment:
-
-You have two options:
-
-1. Source code deploy using `apprunner.yaml`.
-2. Container deploy using the included `Dockerfile`.
-
-For the source code path, App Runner can build directly from the repo with the included `apprunner.yaml`.
+You can deploy this app as source code or as a container. The included `Dockerfile` works for ECS, App Runner, and most other container platforms.
 
 Set these runtime environment variables:
 
 ```env
-AWS_REGION=ap-southeast-1
-AI_MODEL=apac.amazon.nova-lite-v1:0
+AWS_REGION=us-east-1
+AI_MODEL=global.amazon.nova-2-lite-v1:0
 APP_ENV=production
 APP_DEBUG=false
 LOG_LEVEL=INFO
@@ -141,5 +134,4 @@ Notes:
 - Use S3 instead of local `uploads` for durable file storage.
 - Use PostgreSQL through RDS or Aurora if you want persistence.
 - Grant the App Runner instance role permission to invoke the configured Bedrock model.
-- If you only want a demo host right now, local SQLite and local uploads are enough for a first deployment.
 - App Runner passes `PORT` automatically, so the app must listen on `0.0.0.0:8080`, which is what the config file uses.

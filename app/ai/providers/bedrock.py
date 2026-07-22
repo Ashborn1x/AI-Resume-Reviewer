@@ -15,13 +15,14 @@ logger = logging.getLogger(__name__)
 class BedrockProvider(AIProvider):
     def __init__(self, *, region_name: str, model_name: str, timeout_seconds: int) -> None:
         self._model_name = model_name
+        self._timeout_seconds = timeout_seconds
         self._client = boto3.client(
             "bedrock-runtime",
             region_name=region_name,
             config=Config(
                 connect_timeout=timeout_seconds,
                 read_timeout=timeout_seconds,
-                retries={"max_attempts": 3, "mode": "standard"},
+                retries={"max_attempts": 1, "mode": "standard"},
             ),
         )
 
@@ -35,12 +36,20 @@ class BedrockProvider(AIProvider):
 
     async def generate_json(self, prompt: str) -> str:
         try:
-            response = await asyncio.to_thread(
-                self._client.converse,
-                modelId=self._model_name,
-                messages=[{"role": "user", "content": [{"text": prompt}]}],
-                inferenceConfig={"temperature": 0.1},
+            response = await asyncio.wait_for(
+                asyncio.to_thread(
+                    self._client.converse,
+                    modelId=self._model_name,
+                    messages=[{"role": "user", "content": [{"text": prompt}]}],
+                    inferenceConfig={"temperature": 0.1},
+                ),
+                timeout=self._timeout_seconds,
             )
+        except asyncio.TimeoutError as exc:
+            raise AIProviderError(
+                f"The AWS Bedrock request timed out after {self._timeout_seconds} seconds. "
+                "Check model access, quotas, and network connectivity."
+            ) from exc
         except (BotoCoreError, ClientError) as exc:
             error_code, error_message = self._extract_error_details(exc)
             logger.warning(

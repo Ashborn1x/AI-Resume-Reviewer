@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     max_upload_size_mb: int = Field(default=5, ge=1, le=50)
     allowed_upload_extensions: set[str] = {"pdf", "docx", "txt"}
 
-    ai_model: str = "anthropic.claude-3-5-haiku-20241022-v1:0"
-    ai_timeout_seconds: int = Field(default=120, ge=5, le=600)
+    ai_model: str = "global.amazon.nova-2-lite-v1:0"
+    ai_timeout_seconds: int = Field(default=45, ge=5, le=600)
     aws_region: str = "us-east-1"
 
     prompt_dir: Path = Path("app/prompts")

@@ -9,4 +9,4 @@ def clean_resume_text(text: str) -> str:
 def normalize_resume_text(text: str) -> str:
     normalized_lines = [line.strip() for line in text.splitlines() if line.strip()]
     normalized = "\n".join(normalized_lines)
-    return normalized[:20000]
+    return normalized[:8000]
